@@ -1,0 +1,115 @@
+摩登海贼，广东人，深圳这边工作，现在跟虫师是同事来的，
+
+开发为主，接触过比较多的语言
+
+ruby，移动端的自动化测试框架，二次开发，calabash
+
+实际上最好的语言，php，测试框架，不是http层级，网络的分层，tcp层的测试框架，socket层的测试
+
+go，一种新型的语言，谷歌发明的语言，前景比较，1.开发效率很高，能够跟java媲美， 2.执行效率比java好高，接近于c++
+
+python + django + vue  +  mysql  全栈工程师，基本上是什么都做，前端+后端，人不够，不得已
+
+
+上课模式：
+上课50分钟，然后后面5-10分钟，都是提问题的环节
+讲课过程中，大家有问题也可以直接提出来，我一般都会解答
+前期一个月都是要在讲基础，后面2-3个月时间，我们是讲项目，大家一起敲代码
+
+基础：
+1.vue的基础，包括基本的语法 v-if, v-for，路由，组件，事件的定义
+1.django的基础，我们的后端接口是如何组织的。
+面向对象的形式来组织，原本来说，我本来是想要给大家学习django rest framework（我当时学也学了一个礼拜）
+我们自己模仿它来手动组织一个类似的路由接口，我们自己实现类似它的功能。
+
+关于前后端分离：就是我django里面的模板方面的代码，全部都移到了vue里面处理，
+所以会有两个程序，一个是html的处理程序，一个django专门处理关于数据库的接口
+
+目标： 做一个接口测试平台
+
+1. 创建前后端，进行基础的设置，关于前后端分离，跨域问题
+2. django后端接口定义规则，日志设置，异常处理模块，统一的响应
+3. 登录模块，登录的持久化（session和cookie）
+4. 服务模块，增删改查
+5. 接口模块，定义，编辑之类
+6. 任务模块，增删改查
+7. 任务的执行，结果展示，pytest（定时执行）
+8. vue打包发布
+9. 前后端生产环境服务部署配置： 
+前端： vue + nginx
+后端： django + nginx
+
+
+
+课程的技术栈：
+1. 开发环境：  
+python  django : pycharm
+vue            : pycharm(需要进行设置)
+1. 打开设置 2.打开插件（plugins）3.点击下面的install jetbrains plugins 4 搜索vue并且安装接口，然后重启编辑器
+
+提前掌握的知识语言
+HTML，css，js，ajax 
+python  django  git
+
+
+vue.js的介绍：https://cn.vuejs.org/v2/guide/
+一个的前端的框架，专门写html代码的框架。可以轻量级，也不可轻量级
+绑定性，响应性，实时性，组件性
+
+控件库： element-ui
+
+
+github: https://github.com/harter123/test-dev3
+课程的视频：
+链接: 链接: https://pan.baidu.com/s/1jyp8er8EC2VwweShS3gjbQ 提取码: vmmy 
+
+必备的软件和库：
+django
+nodejs（一定要用稳定版，上官网就可以下载）https://nodejs.org/en/download/
+装完后自动会有两个程序  node， npm  
+
+安装vue-cli:  npm install  -g @vue/cli 
+npm config set registry https://registry.npm.taobao.org
+// （如果比较慢，配置这个taobao的源，这个比较快，然后在执行安装的命令）
+
+
+把我们的两个程序给创建起来，vue程序和django程序
+创建vue项目：
+1.vue create 项目名称
+2.然后进行一下特性选择，也可以直接选择default
+
+3.执行vue： npm run serve
+
+4.vue 项目引入element-ui:
+ npm i element-ui -S 安装
+
+在 main.js 中写入以下内容：
+
+import Vue from 'vue';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+import App from './App.vue';
+
+Vue.use(ElementUI);
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+});
+
+5.安装axios，用来发送http请求（ajax）
+npm install axios -S
+https://www.kancloud.cn/yunye/axios/234845
+ 
+
+前端的命名规则是  驼峰式    getData
+后端的命名规则是  斜杠式    get_data
+
+作业：
+1.把今天的vue给安装好，并且运行起来
+2.希望大家能够先去熟悉一下vue的语法
+https://www.runoob.com/vue2/vue-install.html
+https://cn.vuejs.org/v2/guide/
+3.在vue里面添加一张图片，并且运行起来，或者是设计一个博客页面
+
+
