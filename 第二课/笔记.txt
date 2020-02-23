@@ -1,0 +1,114 @@
+vue项目的目录结构：
+
+1. package.json 主要是说明项目的一些信息，依赖文件，命令定义等
+2. node_modules 依赖文件
+3. public 主要是放一些外部的静态文件
+4. src主要的代码文件
+	assets 资源文件
+	components 组件的文件
+	router 路由定义
+	views 页面文件
+	App.vue  入口vue文件，后面所有的页面都是从这个页面延伸出来
+	main.js  项目的主文件，可以理解为 c语言的main()
+
+vue项目的执行逻辑：
+1. main.js 这个主文件
+2. 加载路由，也就是router/index.js
+3. 进入App.vue 这个主页面文件
+
+
+vue文件最常见的结构：
+1. 三层结构：html + js + css
+html: 固定格式
+<template>
+   <div>
+	xxxxx  这里就随便怎么写都行
+   </div>
+</template>
+
+2. js部分：
+<script>
+    // @ is an alias to /src
+    import HelloWorld from '@/components/HelloWorld.vue'
+
+    export default {
+        name: 'home',        # 类的名称
+        components: {        # 类的依赖
+            HelloWorld
+        },
+	props:{              # 类初始化接受的参数
+            arg: String,
+        },
+        date(){              # 类的成员变量
+            return {
+                message: 'message',
+		a: "xxxx",
+            }
+        },
+        methods: {           # 类的成员变量
+	    getData(){
+	    },
+        },
+        created(){           #类的初始化函数
+
+        },
+    }
+</script>
+
+把它当成一个类。
+
+class home:
+	message = "my message" 类比 data
+	a = "xxxx"
+	
+	def __init__(arg){} 类比 props
+	
+	def getData(self):  类比methods
+		return ""
+        
+3. css:  scoped代表是这个css只作用于当前文件
+<style scoped>
+    .mycss {
+        
+    }
+</style>
+
+
+如何使用组件：
+1. 创建组件
+2. 在父组件里面导入子组件
+3. 在父组件里面的components进行注册
+4. 把子组件的名称当做是标签来使用
+
+
+vue各种指令和语法
+1. 数据的展示
+{{ message }} 大括号包含变量
+<div v-html="htmlMessage"></div>  把变量解析成为html代码
+
+
+2. 属性
+<div :id="idMessage" name="hello" :class="classMessage">
+就是对照着 vue 里面props   # 类比初始化参数 
+
+
+3. 指令
+v-if  v-else  v-else-if
+v-show  主要是控制标签的display属性是否展示和隐藏
+v-for   类比python的 for i in list
+<div v-for="item in listMessage" :key="item">   这个是固定用法，一定要是唯一
+     {{item}}
+</div>
+
+4.事件处理
+@ + 事件名称
+<el-button @click="buttonEvent">vue button</el-button>
+@click @change @select @focus 还有很多各种事件
+
+
+5. 表单绑定 v-model
+<input>
+<select>
+<radio>
+<checkbox>
+双向绑定
