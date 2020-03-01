@@ -1,0 +1,75 @@
+大纲：
+1. 介绍vue路由
+2. 解释vue admin模板项目
+
+
+js 里面import一个目录，那么就等于import这个目录下的index文件
+import router from './router'
+import router from './router/index.js'
+上面这两个是一样
+
+
+路由：
+1. 每一个路由定义都是附带上一个组件（页面）
+比如说django ('/text', getText)
+vue也类似：
+{
+	path: '/',
+	name: 'home',
+	component: Home
+},
+
+
+	{
+        path: '/',
+        name: 'home',
+        component: Home
+    },
+    {
+        path: '/about',
+        name: 'about',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    },
+	
+我们在访问的时候
+/       -> App.vue + home.vue
+/about  -> App.vue + about.vue
+
+延伸出一个问题： App 和 home,about 是怎么相加
+答案： <router-view/>  这个是很关键
+比如 访问"/"：      app + home 是怎么相加的，把home页面整个页面都替代app里面的<router-view/>
+比如 访问"/about"： app + about about页面整个页面都替代app里面的<router-view/>
+
+某种程度上，这个App.vue 是不是很类似一个模板的作用，但是这样是不贴切
+把App.vue理解为一棵树的根节点就很贴切了
+
+
+{
+        path: '/about',
+        name: 'about',
+        component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+        children:[
+            {
+                path: 'test',
+                name: 'home',
+                component: () => import(/* webpackChunkName: "about" */ '../components/test.vue'),
+            }
+        ]
+    },
+/about/test
+App + about + test: 把test 替代about里面的<router-view/>，然后about页面整个页面都替代app里面的<router-view/>
+
+
+模板：
+https://panjiachen.github.io/vue-element-admin-site/zh/guide/#%E5%8A%9F%E8%83%BD 首页
+
+
+
+
+
+
+
+
