@@ -1,0 +1,113 @@
+大纲内容：
+1. 登录页面的样式设置
+2. 前后端的跨域问题设置
+
+
+<el-input
+          ref="username"
+          v-model="loginForm.username"
+          placeholder="Username"
+          name="username"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+
+v-model="loginForm.username" 代表这个文本框跟这个变量进行绑定
+
+
+<el-input
+          :key="passwordType"
+          ref="password"
+          v-model="loginForm.password"
+          :type="passwordType"
+          placeholder="Password"
+          name="password"
+          tabindex="2"
+          auto-complete="on"
+          @keyup.enter.native="handleLogin"
+        />
+@keyup.enter.native="handleLogin"  在这个文本框里面点击enter的按钮触发的事件
+
+
+handleLogin() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+         //参数校验成功的代码
+        } else {
+          参数校验失败的代码
+        }
+      })
+    }
+
+这一坨实际上是element-ui得固定代码，用来进行参数检验。例如校验有没有输入用户名和密码
+
+
+关于vue的ref
+ref="loginForm"  这个可以立即为一个id，就是vue里面专用的id
+平常html里面的控件的唯一标志是id，那么到了vue, vue就用ref来代替id
+
+如何使用ref: 固定格式： this.$refs.后面接上定义这个ref, 比如上面这个 this.$refs.loginForm
+
+
+
+关于跨域的问题：  为什么会有这个，想想钓鱼网站，你点击一个图片，说不定就会去给人家转了钱
+
+不同的域名之间进行请求通信，会出触发跨域问题：
+在当前域名页面，请求其他的域名的接口，用来更新当前域名的数据，然后页面还是当前域名
+
+跟超链接跳转不是同一回事
+
+这个就是跨域的错误信息
+Access to XMLHttpRequest at 'http://127.0.0.1:8000/test'
+ from origin 'http://localhost:8080' has been blocked by CORS policy:
+ Response to preflight request doesn't pass access control check: 
+Redirect is not allowed for a preflight request.
+
+
+所以，我们vue和django会存在这个跨域的问题
+如何结局
+
+a. pip install django-cors-headers
+b. INSTALLED_APPS = [
+    ...
+    'corsheaders'，
+    ...
+ ]  添加上这个app
+c. MIDDLEWARE_CLASSES = (
+    ...
+    'corsheaders.middleware.CorsMiddleware', # 添加上这个中间件
+    'django.middleware.common.CommonMiddleware', # 注意顺序， 必须是这个顺序
+    ...
+)   添加上这个中间件
+
+d. 添加上一些跨域的设置
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    '*'
+)
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'VIEW',
+)
+
+CORS_ALLOW_HEADERS = (
+    'XMLHttpRequest',
+    'X_FILENAME',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Pragma',
+)
