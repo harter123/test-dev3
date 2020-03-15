@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.http import HttpResponse
+from interface_app.views import user_view
 
-def test(request):
-    return HttpResponse('123')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('test/', test)
+    path('user/login/', user_view.user_login),
+    path('user/register/', user_view.user_register),
+    path('user/logout/', user_view.user_logout),
+    path('user/info/', user_view.get_user_info),
 ]

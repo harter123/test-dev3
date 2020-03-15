@@ -51,7 +51,7 @@
 </template>
 
 <script>
-    import {login} from "../../request/user";
+    import {login, register} from "../../request/user";
 
     export default {
         name: 'Login',
@@ -73,8 +73,8 @@
             handleLogin() {
                 this.$refs.loginForm.validate(valid => {
                     if (valid) {
-                        this.loading = true
-                        login('111', '222');
+                        // this.loading = true
+                        login(this.loginForm.username, this.loginForm.password)
                     } else {
                         console.log('error submit!!')
                         return false
@@ -84,8 +84,12 @@
             handleRegister() {
                 this.$refs.loginForm.validate(valid => {
                     if (valid) {
-                        this.loading = true
+                        // this.loading = true
+                        register(this.loginForm.username, this.loginForm.password).then(data => {
+                            console.log(data)
+                        }).catch(data=>{
 
+                        })
                     } else {
                         console.log('error submit!!')
                         return false

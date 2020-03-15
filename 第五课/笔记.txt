@@ -1,0 +1,103 @@
+1. 把我们的前后端的登录页面的交互给做起来
+2. 对首页的前端ui进行模仿设计
+
+
+1.1先定义一下我们后端响应格式
+{
+	"data": {},
+	"success": true or false
+	"error": {
+		"code": 1000 #错误码
+		"message": "文本"
+	}
+}
+
+JsonResponse 对象：
+
+class JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None,**kwargs)
+
+这个类是HttpRespon的子类，它主要和父类的区别在于：
+
+1.它的默认Content-Type 被设置为： application/json
+
+2.第一个参数，data应该是一个字典类型，当 safe 这个参数被设置为：False ,那data可以填入任何能被转换为JSON格式的对象，比如list, tuple, set。 默认的safe 参数是 True. 如果你传入的data数据类型不是字典类型，那么它就会抛出 TypeError的异常。
+
+3.json_dumps_params参数是一个字典,它将调用json.dumps()方法并将字典中的参数传入给该方法。
+
+
+user = authenticate(username=name, password=password) 
+这个函数专门用来校验用户名和密码是否是正确的，然后返回一个user对象
+from django.contrib.auth.models import User  这个是django内置的用户表
+
+login(request, user)  # 登录持久化，代表在django里面登录了这个用户
+1. 在session表创建一条数据
+2. 把session的数据发到前端的cookie，前端会自动保存跟管理的了（在http的header里面）
+
+3. 所以前端后面发过来的数据的cookie都会有这个session的数据
+
+
+token使用的原理：
+token实际上就是一个hash串，把用户的信息加密为哈希穿
+然后前端把token发到后端，后端就把token就行校验和解密，然后把里面的用户信息取出来
+
+
+
+创建用户必须这么写
+User.objects.create_user(username=name, password=password)
+是因为这样写，密码才会加密，
+也只有这么写了，才可以用上面登录的那个authenticate方法，否则，上面的authenticate会失效
+
+
+
+logout(request)  跟login是反过来的
+1. 在session表删除掉那个用户的session信息
+2. 把session的删除操作发到前端的cookie，前端会自动保存跟管理的了（在http的header里面）
+
+3. 所以前端后面发过来的数据的cookie就不会有这个session的数据
+
+
+
+如何快速导入一个库：
+1. 把鼠标移到需要导入的那个方法
+2. 按住alt键
+3. 点击enter
+4. 选择需要导入的库
+
+
+
+request.user  可以直接获取得到已经登录的用户的信息
+
+
+还有对登录一些设置，进入setting文件：
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 引擎（默认）
+SESSION_COOKIE_NAME = "sessionid"  # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串（默认）
+SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径（默认）
+SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名（默认）
+SESSION_COOKIE_SECURE = False  # 是否Https传输cookie（默认）
+SESSION_COOKIE_HTTPONLY = True  # 是否Session的cookie只支持http传输（默认）
+SESSION_COOKIE_AGE = 1209600  # Session的cookie失效日期（2周）（默认）
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 是否关闭浏览器使得Session过期（默认）
+SESSION_SAVE_EVERY_REQUEST = False  # 是否每次请求都保存Session，默认修改之后才保存（默认
+SESSION_COOKIE_SAMESITE = None
+
+
+把参数校验给取出来，拿到一个特定的模块去做：
+
+这里有两个参数，username, password
+class UserForm(forms.Form):
+    username = forms.CharField(max_length=50,
+                               min_length=3,
+                               required=True)
+    password = forms.CharField(max_length=50,
+                               min_length=3,
+                               required=True)
+这里定义了3条规则，1.最大长度是50，2.最小长度是3， 3.这是必填项
+
+使用方式：
+form = UserForm(data)
+if not form.is_valid():
+    return response_failed()
+user = authenticate(username=form.cleaned_data["username"], password=form.cleaned_data["password"])
+
+form.cleaned_data 拿到上面定义的数据 username, password
+
