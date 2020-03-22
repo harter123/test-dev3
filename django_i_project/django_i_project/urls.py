@@ -16,13 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from interface_app.views import user_view
-
-
+from interface_app.views.service.service_detail import ServiceDetailView
+from interface_app.views.service.service_list import ServiceListView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('user/login/', user_view.user_login),
-    path('user/register/', user_view.user_register),
-    path('user/logout/', user_view.user_logout),
-    path('user/info/', user_view.get_user_info),
+    path('api/admin/', admin.site.urls),
+    path('api/user/login/', user_view.user_login),
+    path('api/user/register/', user_view.user_register),
+    path('api/user/logout/', user_view.user_logout),
+    path('api/user/info/', user_view.get_user_info),
+
+    path('api/services/', ServiceListView.as_view()),
+    path('api/service/<int:service_id>/', ServiceDetailView.as_view()),
 ]

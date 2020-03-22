@@ -1,0 +1,192 @@
+1. 完成登录模块的前后端交互
+2. 开始设计service的功能
+
+
+登录的逻辑：
+1. 访问登录页面，可以正常访问登录页面
+2. 访问主页面（除了登录页面之外所有页面），我们要先去检查一下是否登录成功了，
+如果成功了，就正常访问。
+如果失败了，就跳转到登录页面。
+
+怎么样能够做到检查所有的页面：  关键的一个vue文件--App.vue
+
+app.vue 这个文件是我们所有的页面的入口文件，我们只要在入口文件进行登录检查，就ok啦
+
+如何入检查是否登录成功： 可以借助获取登录用户信息这个接口
+
+vue是如何进行页面跳转：
+
+this.$router.push('/login'); 这是最简单的方式，还有更加复杂的形式，我们就不讲了，有兴趣可以自行研究
+
+
+如何用面向对象的方式进行接口的定义：
+
+我们想容纳接口的service，也就是服务
+class Service(models.Model):
+    name = models.CharField('名称', blank=False, max_length=200, default="")
+    description = models.CharField('描述', blank=False, max_length=2000, default="")
+就两个字段
+
+然后在定义form文件，就是用来进行参数校验：
+class ServiceForm(forms.Form):
+    name = forms.CharField(max_length=200,
+                           min_length=1,
+                           required=True)
+    description = forms.CharField(max_length=2000,
+                                  min_length=1,
+                                  required=True)
+
+我们对一个表的操作通常有哪几种： 增删改查
+1. 增加  2. 更新  3. 删除  4. 获取单个数据  5. 获取多个数据
+
+
+关于rest风格接口的说明：
+以前我们定义一个接口就是 一个url
+rest风格的接口是  一个Url + 请求方法， （url + 方法确定一个接口）
+举个例子：  有个/user 的url, 如果用传统的定义方式，这个url就只是一个接口
+但是如果rest的方格定义，那么这个url 是有无数个接口的定义
+1.get     /user  
+2.post    /user
+3.delete  /user
+4.put     /user
+5.patch   /user
+这里就定义了5个接口，他们的url都是一个样的。如果有更多的方法，甚至会有无数个接口
+
+
+GET（SELECT）：从服务器取出资源（一项或多项）。                  就是获取数据
+POST（CREATE）：在服务器新建一个资源。                           就是创建
+PUT（UPDATE）：在服务器更新资源（客户端提供改变后的完整资源）。  就是用来全量修改
+PATCH（UPDATE）：在服务器更新资源（客户端提供改变的属性）。      就是用来部分修改
+DELETE（DELETE）：从服务器删除资源。                             就是用删除数据
+
+我们后面定义接口的一个基础原则
+
+一个url 可以对于一个model对象，然后不同的请求方法，就对应着不同的操作
+以上面的service为例
+定义一个url   /service/   -----> Service这个表
+
+get     /service/      获取Service表的单个数据或者是列表
+post    /service/      创建Service表数据
+put     /service/      全量修改Service表数据
+patch   /service/      部分修改Service表数据
+delete  /service/      删除Service表的数据
+
+get方法会进行细分，因为他没办法用一个url + get来同时做两个事情，
+所以呢，我们会重新定义一个url，专门来处理列表的形式
+还是上面的例子，我们会定义一个叫 /services/的url, 专门来处理列的获取
+所以上面的就变成这样了
+
+get     /services/     获取Service表列表
+get     /service/      获取Service表的单个数据
+post    /service/      创建Service表数据
+put     /service/      全量修改Service表数据
+patch   /service/      部分修改Service表数据
+delete  /service/      删除Service表的数据
+
+通常来说，我们确定一个唯一的数据是根据id，所以上面对单个数据的操作，我们会把id放到url里面，这样好操作
+所以上面就变成了这样了:
+get     /services/       获取Service表列表数据
+get     /service/1/      获取Service表的单个数据
+post    /service/        创建Service表数据
+put     /service/1/      全量修改Service表数据
+patch   /service/1/      部分修改Service表数据
+delete  /service/1/      删除Service表的数据
+
+上面只有创建数据和获取列表数据是没有id的，所以呢，我们为了统一，也为了省事，
+我们会把post的请求url跟获取列表的url搞到相同：
+
+get     /services/       获取Service表列表数据
+post    /services/       创建Service表数据
+
+get     /service/1/      获取Service表的单个数据
+put     /service/1/      全量修改Service表数据
+patch   /service/1/      部分修改Service表数据
+delete  /service/1/      删除Service表的数据
+
+这个就是rest风格的演变过程。这个就是最终版了
+所以我们通常来说，一个modal会给他定义两个url，一个处理列表和新增数据，一个处理单个数据（增删查改）
+
+
+# 这个是定义  /services/  
+from django.views.generic import View
+class ServiceListView(View):
+
+    def get(self, request, *args, **kwargs):
+        """
+        这个是获取列表
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pass
+
+    def post(self, request, *args, **kwargs):
+        """
+        这个是创建数据
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pass
+
+
+# 这个是定义  /service/
+from django.views.generic import View
+class ServiceDetailView(View):
+
+    def get(self, request, service_id, *args, **kwargs):
+        """
+        这个是单个数据
+        :param request:
+        :param service_id:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pass
+
+    def put(self, request, service_id, *args, **kwargs):
+        """
+        这个是全量修改数据
+        :param request:
+        :param service_id:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pass
+
+    def patch(self, request, service_id, *args, **kwargs):
+        """
+        这个是部分修改数据
+        :param request:
+        :param service_id:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pass
+
+    def delete(self, request, service_id, *args, **kwargs):
+        """
+        这个是删除数据
+        :param request:
+        :param service_id:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pass
+
+路由的注册方式
+path('api/services/', ServiceListView.as_view()),
+path('api/service/<int:service_id>/', ServiceDetailView.as_view()),
+
+get        api/services/   获取的是列表
+post       api/services/   创建列表
+
+get        api/service/1    获取数据
+patch/put  api/service/1  修改数据
+delete     api/service/1   删除数据

@@ -3,14 +3,14 @@ import {deleteRequest, getRequest, postRequest} from "./common";
 export const login = function (username, password) { //登录
     return postRequest('user/login/', {
         username: username,
-        password: password
+        password: password,
     })
 };
 
 export const register = function (username, password) { //登录
     return postRequest('user/register/', {
         username: username,
-        password: password
+        password: password,
     })
 };
 
