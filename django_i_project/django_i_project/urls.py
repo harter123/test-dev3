@@ -18,6 +18,8 @@ from django.urls import path
 from interface_app.views import user_view
 from interface_app.views.service.service_detail import ServiceDetailView
 from interface_app.views.service.service_list import ServiceListView
+from interface_app.views.task.task_detail import TaskDetailView
+from interface_app.views.task.task_list import TaskListView
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
@@ -27,5 +29,7 @@ urlpatterns = [
     path('api/user/info/', user_view.get_user_info),
 
     path('api/services/', ServiceListView.as_view()),
-    path('api/service/<int:service_id>/', ServiceDetailView.as_view()),
+    path('api/service/<int:base_id>/', ServiceDetailView.as_view()),
+    path('api/tasks/', TaskListView.as_view()),
+    path('api/task/<int:base_id>/', TaskDetailView.as_view()),
 ]

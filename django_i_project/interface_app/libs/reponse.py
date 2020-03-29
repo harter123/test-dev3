@@ -4,6 +4,8 @@ from django.http import JsonResponse
 class ErrorCode:
     common = 10000
     auth = 10001
+    service = 10002
+    task = 10003
 
 
 # 这是一个通用的

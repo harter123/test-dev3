@@ -1,0 +1,153 @@
+1. 先完成service模块的接口
+2. 学习使用nginx对我们的前后端进行配置，解决跨域的问题
+
+
+例如有一个字典
+data = {"a": 1, "b": 2}
+
+def test(a, b):
+	print(a, b)
+	
+
+test(a=data["a"], b=data["b"])
+test(**data)
+
+这是python的一种语法糖，一种简写
+
+
+**data  等于是把所有的数据都取出来，然后按照key=value的形式进行组装
+
+**data == a=data["a"], b=data["b"]
+**data == a=1, b=2
+假如
+data = {
+"a": 1, "b": 2, "c": 3
+}
+
+**data == a=data["a"], b=data["b"], c=data["c"]
+**data == a=1, b=2, c=3
+
+所以上面的test函数就会出错，因为test只有两个参数
+
+
+如果test定义为这个
+def test(**kargs):
+   pass
+就不会出错了
+
+
+Service.objects.filter(id=service_id)  获取来的结果是一个数组，就算只有一个数据
+Service.objects.filter(id=service_id).first()  这个就代表获取数组的第一个数据，是一个对象
+
+
+
+封装抽象的一个原则，就是把相同的东西提取出来
+
+
+
+
+
+nginx:
+就是一个web的服务器，一般监听80端口，这是业内公认的性能最强大，最轻量级别的服务器。
+作用：请求分发，代理，反向代理，静态资源访问器。
+
+最常见的是作为一个服务器的入口（80端口），然后nginx分发到其他的服务
+
+
+1. 下载nginx
+
+http://nginx.org/en/docs/windows.html
+https://www.cnblogs.com/jiangwangxiang/p/8481661.html
+
+nginx 启动nginx
+nginx -s stop	fast shutdown
+nginx -s quit	graceful shutdown
+nginx -s reload	changing configuration, starting new worker processes with a new configuration, graceful shutdown of old worker processes
+nginx -s reopen	re-opening log files
+
+
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+	
+	# 这个代表一个监听80端口的服务器
+    server {
+        listen       80;  # 端口
+        server_name  localhost, 127.0.0.1;  # 域名，如果你部署到线上，那么就写线上的域名
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+		
+		#root C:/classes/test-dev2/test-dev2/vue-interface-project/dist;
+		index index.html index.htm;
+
+		keepalive_timeout   70;
+		
+		gzip on;
+		gzip_min_length 200;
+		gzip_buffers 4 16k;
+		gzip_comp_level 6;
+		gzip_types text/plain application/javascript text/css application/xml text/javascript application/json;
+		gzip_vary on;
+		gzip_disable "MSIE [1-6]\.";
+		gzip_proxied any;
+		
+		# 配置django ，如果符合 /api/ 开头的url，就转发到http://127.0.0.1:8000
+		location /api/ {
+            proxy_pass http://127.0.0.1:8000;
+            proxy_pass_request_headers      on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+		
+		# 配置vue，默认的所有的请求，都转发到  http://127.0.0.1:8080;  比上面多了几个配置，因为要支持websocket
+		location / {
+			proxy_http_version 1.1;
+			proxy_set_header Upgrade $http_upgrade;
+			proxy_set_header Connection "upgrade";
+            proxy_pass http://127.0.0.1:8080;
+            proxy_pass_request_headers      on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+		
+    }
+
+
+}
+
+
+
+为什么会有跨域问题呢：
+   是否跨域，取决于浏览器，如果浏览区在同一个页面，跟两个以上的域名打交道，就是跨域
