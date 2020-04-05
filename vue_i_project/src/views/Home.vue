@@ -3,47 +3,90 @@
         <div class="left-menu">
             <el-menu
                     style="height: 100%;"
-                    default-active="2"
+                    :default-active="activeIndex"
                     class="el-menu-vertical-demo"
                     background-color="#304156"
                     active-text-color="#409eff"
+                    @select="handleSelect"
                     text-color="#fff">
 
-                        <el-menu-item index="1" style="text-align: left">
-                            <i class="el-icon-menu"></i>
-                            <span slot="title">服务</span>
-                        </el-menu-item>
-                        <el-menu-item index="2" style="text-align: left">
-                            <i class="el-icon-setting"></i>
-                            <span slot="title">任务</span>
-                        </el-menu-item>
-                        <el-menu-item index="3" style="text-align: left">
-                            <i class="el-icon-user"></i>
-                            <span slot="title">退出登录</span>
-                        </el-menu-item>
+                <el-menu-item index="service" style="text-align: left">
+                    <i class="el-icon-menu"></i>
+                    <span slot="title">服务</span>
+                </el-menu-item>
+                <el-menu-item index="task" style="text-align: left">
+                    <i class="el-icon-setting"></i>
+                    <span slot="title">任务</span>
+                </el-menu-item>
+                <el-menu-item index="logout" style="text-align: left">
+                    <i class="el-icon-user"></i>
+                    <span slot="title">退出登录</span>
+                </el-menu-item>
             </el-menu>
         </div>
 
-        <div class="right-context"></div>
+        <div class="right-context">
+            <router-view/>
+        </div>
     </div>
 </template>
 
 <script>
     // @ is an alias to /src
+    import {logout} from "../request/user";
 
     export default {
         name: 'home',
-        components: {},
         props: {
-            arg: String,
+            menu: String
         },
-        date() {
+        components: {},
+        data() {
             return {
-                message: 'message'
+                activeIndex: "service",
             }
         },
-        methods: {},
+        methods: {
+            logoutUser() {
+                logout().then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.$router.push('/login')
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                });
+            },
+            handleSelect(index, keyPath) {
+                this.activeIndex = index;
+                switch (index) {
+                    case "logout":
+                        this.logoutUser();
+                        break;
+                    case "service":
+                        this.$router.push('/service');
+                        break;
+                    case "task":
+                        this.$router.push('/task');
+                        break;
+                }
+            },
+            // initMenu() {
+            //     //indexOf 代表查找这个字符串是否包含，如果包含，则返回字符串的位置，如果不包含，就返回-1
+            //     if (String(this.$route.path).indexOf('task') > -1) {
+            //         this.activeIndex = 'task';
+            //     }
+            //     if (String(this.$route.path).indexOf('service') > -1) {
+            //         this.activeIndex = 'service';
+            //     }
+            // }
+        },
         created() {
+            // this.initMenu();
+            this.activeIndex = this.menu;
         },
 
     }
@@ -54,9 +97,11 @@
         display: flex;
         height: 100%;
     }
+
     .left-menu {
         width: 15%;
     }
+
     .right-context {
         width: 85%;
     }

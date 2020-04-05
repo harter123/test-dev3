@@ -1,0 +1,206 @@
+1. 添加上 退出登录的功能
+2. 动态路由的配置方式
+
+
+退出登录逻辑：
+请求成功的情况下，应该要重新进入登录页面；否则就啥也不作
+
+
+
+el-menu 中的activeindex 用来控制那个菜单是激活状态，但是element有个缺陷，就是如果手动选择了某个菜单
+这个activeindex变量是不会变得，还是原来的值
+
+
+service页面和task页面，拥有自己独立的页面
+
+
+在某个path下，如果需要进行延伸定义，就必须要在children 里面定义
+{
+        path: '/',
+        name: 'home',
+        component: Home,
+        children: [   # 
+            {
+                path: 'service',
+                name: 'service',
+                component: () => import('../views/service/index'),
+            },
+            {
+                path: 'task',
+                name: 'task',
+                component: () => import('../views/task/index'),
+            }
+        ]
+    },
+	
+这里就定义了两个路由
+/service  页面内容 App + home + service
+app + home 是怎么相加的，把home页面整个页面都替代app里面的<router-view/>
+app + home + service 是怎么相加的，
+1. 把home页面整个页面都替代app里面的<router-view/>
+2. 把service页面整个页面都替代home里面的<router-view/>
+
+	
+/task     页面内容 App + home + task
+app + home 是怎么相加的，把home页面整个页面都替代app里面的<router-view/>
+app + home + task 是怎么相加的，
+1. 把home页面整个页面都替代app里面的<router-view/>
+2. 把task页面整个页面都替代home里面的<router-view/>
+
+所以： 只需要在home里面定义一个<router-view/>
+
+@cici_
+感觉就是填充，home页面有部分公用的就是左侧的菜单栏，然后右边的是动态变化，
+就留了个router-view占坑，然后用children里面的定义的路径，对应的组件去填充
+
+
+
+为什么左侧的activeindex一直都是 service：
+因为home组件在初始化的值就是service，所以每次刷新页面后，这个值都重新被还原为 service
+只有我们在手动点击菜单的时候，我们才会去主动改变 activeindex 的值
+就是在点击菜单的事件处理里面
+handleSelect(index, keyPath) {
+	this.activeIndex = index;  # 这里改变activeindex 的值
+	switch (index) {
+		case "logout":
+			this.logoutUser();
+			break;
+		case "service":
+			this.$router.push('/service');
+			break;
+		case "task":
+			this.$router.push('/task');
+			break;
+	}
+}
+
+怎么解决这个问题：关键在于在初始化的时候，这个activeindex 的值不能是固定
+1. 在home组件定义一个参数
+props: {  
+	menu: String, //这个代表初始化的菜单
+},
+
+2. 然后在初始化的时候，把menu赋值给activeindex，问题就解决了
+created() {
+	this.activeIndex = this.menu; //这里初始化 activeIndex 这个值
+},
+
+那么就剩下一个问题，怎么传menu，我们这个home是根据 路由里面定义的， 怎么传递
+
+这里可以在路由里面定义
+我们改变一下我们的路由，然后路由里面传递数据，添加props里面传递数据
+const routes = [
+    {
+        path: '/',
+        name: 'home',
+        component: Home,
+        props: {
+            menu: 'service'
+        },
+        children: [
+            {
+                path: 'service',
+                name: 'service',
+                component: () => import('../views/service/index'),
+            },
+        ]
+    },
+    {
+        path: '/',
+        name: 'home',
+        component: Home,
+        props: {
+            menu: 'task'
+        },
+        children: [
+            {
+                path: 'task',
+                name: 'task',
+                component: () => import('../views/task/index'),
+            }
+        ]
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('../views/login'),
+    }
+];
+
+回忆：
+<script>
+    // @ is an alias to /src
+    import HelloWorld from '@/components/HelloWorld.vue'
+
+    export default {
+        name: 'home',        # 类的名称
+        components: {        # 类的依赖
+            HelloWorld
+        },
+		props:{              # 类初始化接受的参数
+				arg: String,
+			},
+		date(){              # 类的成员变量
+			return {
+				message: 'message',
+				a: "xxxx",
+			}
+		},
+		methods: {           # 类的成员变量
+			getData(){
+			},
+		},
+		created(){           #类的初始化函数
+
+		},
+    }
+</script>
+
+把它当成一个类。
+
+class home:
+	message = "my message" 类比 data
+	a = "xxxx"
+	
+	def __init__(arg){} 类比 props
+	
+	def getData(self):  类比methods
+		return ""
+
+
+第二种方式：
+
+简单点:
+如果url包含 task， 那么菜单就是task
+如果url包含 service， 那么菜单就是service
+
+this.$route.path  这个就是获取完整的url
+
+if(String(this.$route.path).indexOf('task') > -1){
+	this.activeIndex = 'task';
+}
+if(String(this.$route.path).indexOf('service') > -1){
+	this.activeIndex = 'service';
+}
+
+
+
+我们回顾一下，组件里面的props有两种数据传递方式：
+1. 在组件调用的时候传递
+<home :menu="service"></home>
+2. 在路由里面传递：
+{
+	path: '/',
+	name: 'home',
+	component: Home,
+	props: {
+		menu: 'service'
+	},
+	children: [
+		{
+			path: 'service',
+			name: 'service',
+			component: () => import('../views/service/index'),
+		},
+	]
+},
