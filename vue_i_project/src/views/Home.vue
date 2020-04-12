@@ -14,6 +14,10 @@
                     <i class="el-icon-menu"></i>
                     <span slot="title">服务</span>
                 </el-menu-item>
+                <el-menu-item index="interface" style="text-align: left">
+                    <i class="el-icon-star-on"></i>
+                    <span slot="title">接口</span>
+                </el-menu-item>
                 <el-menu-item index="task" style="text-align: left">
                     <i class="el-icon-setting"></i>
                     <span slot="title">任务</span>
@@ -68,6 +72,9 @@
                         break;
                     case "service":
                         this.$router.push('/service');
+                        break;
+                    case "interface":
+                        this.$router.push('/interface');
                         break;
                     case "task":
                         this.$router.push('/task');

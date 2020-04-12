@@ -1,0 +1,61 @@
+内容： service模块前端增删改查
+
+
+有个问题：我们访问首页，右侧是的内容是空的
+为什么：是因为我们没有定义 "/"这个路由
+
+如何解决：
+{
+        path: '/',
+        name: 'home',
+        component: Home,
+        props: {
+            menu: 'service'
+        },
+        children: [
+            {
+                path: 'service',
+                name: 'service',
+                component: () => import('../views/service/index'),
+            },
+            { # 在这里添加一个空路由就可以了
+                path: '',
+                name: 'service',
+                component: () => import('../views/service/index'),
+            },
+        ]
+    },
+	
+	
+element-ui的form里面所有的字段的名称一定要一一对应，否则就会出问题。
+<el-form :model="addForm" :rules="addRules" ref="addFormRef" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="addForm.name"></el-input>
+                </el-form-item>
+
+                <el-form-item label="描述" prop="description">
+                    <el-input type="textarea" v-model="addForm.description"></el-input>
+                </el-form-item>
+            </el-form>
+
+addForm: {
+	name: "",
+	description: "",
+},
+addRules: {
+	name: [
+		{required: true, message: '请输入名称', trigger: 'blur'},
+	],
+	description: [
+		{required: true, message: '请填写描述', trigger: 'blur'}
+	]
+}
+
+新手特别容易忽略了这个  prop="name" 这个属性，这个也是要跟变量名一样的
+
+
+this.$refs.addFormRef 这句代码就等于获取上述表单的控件 addFormRef 代表上述表单定义的ref属性，就是在vue里面的id
+
+flex 布局是非常强大的，学了一个flex，基本上可以应对所有的ui布局
+http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html
+

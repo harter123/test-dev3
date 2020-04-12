@@ -47,7 +47,8 @@ class MyBaseDetailView(View):
             return response_failed(code=self.code, message='数据不存在')
 
         # service = self.model.objects.filter(id=service_id).update(name=form.cleaned_data["name"], description=form.cleaned_data["description"])
-        service = self.model.objects.filter(id=base_id).update(**form.cleaned_data)
+        self.model.objects.filter(id=base_id).update(**form.cleaned_data) # 这里返回的id
+        service = self.model.objects.filter(id=base_id).first()
         return response_success(model_to_dict(service))
 
     def patch(self, request, base_id, *args, **kwargs):

@@ -18,6 +18,11 @@ const routes = [
                 name: 'service',
                 component: () => import('../views/service/index'),
             },
+            {
+                path: '',
+                name: 'service',
+                component: () => import('../views/service/index'),
+            },
         ]
     },
     {
@@ -32,6 +37,21 @@ const routes = [
                 path: 'task',
                 name: 'task',
                 component: () => import('../views/task/index'),
+            }
+        ]
+    },
+    {
+        path: '/',
+        name: 'home',
+        component: Home,
+        props: {
+            menu: 'interface'
+        },
+        children: [
+            {
+                path: 'interface',
+                name: 'interface',
+                component: () => import('../views/interface/index'),
             }
         ]
     },
