@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from interface_app.views import user_view
+from interface_app.views.interface.inerface_detail import InterfaceDetailView
+from interface_app.views.interface.interface_list import InterfaceListView
 from interface_app.views.service.service_detail import ServiceDetailView
 from interface_app.views.service.service_list import ServiceListView
 from interface_app.views.task.task_detail import TaskDetailView
@@ -30,6 +32,10 @@ urlpatterns = [
 
     path('api/services/', ServiceListView.as_view()),
     path('api/service/<int:base_id>/', ServiceDetailView.as_view()),
+
     path('api/tasks/', TaskListView.as_view()),
     path('api/task/<int:base_id>/', TaskDetailView.as_view()),
+
+    path('api/interfaces/', InterfaceListView.as_view()),
+    path('api/interface/<int:base_id>/', InterfaceDetailView.as_view()),
 ]

@@ -1,0 +1,47 @@
+内容：接口管理的增删改查
+
+先定义interface 表
+
+from django.db import models
+
+
+# Create your models here.
+
+class Interface(models.Model):
+    name = models.CharField('名称', blank=False, max_length=200, default="")
+    description = models.CharField('描述', blank=False, max_length=2000, default="")
+    service_id = models.IntegerField('service的id', default=0)
+    context = models.CharField('内容', blank=False, max_length=4000, default="{}")
+    # 这个就是json的转成字符串
+    # 这里包括 method, url, 参数，断言
+    # {
+    #     "method": "get",
+    #     "url": "",
+    #     "params": {},
+    #     "assert": {}
+    # }
+	
+	
+这里的interface_detail 和interface_list不能直接沿用base_deatail 和 base_list的代码
+因为我们这个context是需要经过json序列化和反序列化，也就是字符串和字典的转换
+
+就是说：我们在前端传输数据的时候，传递context是一个字典，但是我们存到数据库里面是一个字符串，所以就需要经过转换
+
+get数据怎么传递啊：
+http://test-dev.com/?service_id=1
+djang怎么获取service_id:
+request.GET = {"service_id": 1}
+
+
+vue 里面的watch:  监听一个变量的变动
+
+watch: {
+	menu: function () {
+		
+	}
+}
+只要是menu的值有变动，就会执行所定义的方法
+
+
+
+element-ui 的表格的 定义自定义的列：scope.row 这个值代表是某一行的数据

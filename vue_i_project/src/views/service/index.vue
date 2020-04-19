@@ -6,8 +6,8 @@
             <el-card class="service-card" v-for="item in serviceList" :key="item.id">
                 <div slot="header" class="service-card-header">
 
-                    <div>
-                        {{item.name}}
+                    <div @click="goToInterface(item.id)">
+                        <a href="javascript:void(0)">{{item.name}}</a>
                     </div>
                     <div>
                         <el-button style="padding: 3px 0;" type="text" @click="openEditModal(item)">编辑
@@ -100,6 +100,9 @@
             this.getAllServicesFun()
         },
         methods: {
+            goToInterface(serviceId){
+                this.$router.push(`/interface/?serviceId=${serviceId}`)
+            },
             deleteServiceFun(serviceId) {
                 this.$confirm('此操作将永久删除该服务, 是否继续?', '提示', {
                     confirmButtonText: '确定',

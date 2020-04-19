@@ -95,7 +95,11 @@
             // this.initMenu();
             this.activeIndex = this.menu;
         },
-
+        watch: {
+            menu: function () {
+                this.activeIndex = this.menu;
+            }
+        }
     }
 </script>
 
