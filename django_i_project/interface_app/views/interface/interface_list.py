@@ -49,7 +49,8 @@ class InterfaceListView(MyBaseListView):
         if "context" not in data:
             return response_failed()
 
-        data['context'] = json.dumps(data['context'], encoding='utf-8')
+        data['context'] = json.dumps(data['context'])
+        print(data)
         form = self.form(data)
         if not form.is_valid():
             return response_failed()

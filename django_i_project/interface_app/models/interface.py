@@ -13,6 +13,12 @@ class Interface(models.Model):
     # {
     #     "method": "get",
     #     "url": "",
-    #     "params": {},
-    #     "assert": {}
+    #     "params": {
+    #         "a": 1,
+    #         "b": 2,
+    # },
+    #     "assert": {
+    #          "a": "include",
+     #         "b": "exclude",
+    #      }
     # }

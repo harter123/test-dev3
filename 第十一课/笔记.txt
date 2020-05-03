@@ -1,0 +1,31 @@
+内容：
+1.把接口模块的创建和编辑完成掉
+2.任务模块完成掉添加接口
+
+
+今天的内容如果能够完成，就基本上前端部分已经结束了
+后面就剩下使用pytest来做任务的执行以及报告的生成
+
+新建和编辑接口：我们分别做一个弹框
+
+
+context是一个json串，所以呢，不能用文本框，我们借用于第三方的一个json编辑器
+vue2-ace-editor
+
+如何使用
+1. npm install --save-dev vue2-ace-editor
+2. components: {
+        editor: require('vue2-ace-editor'),
+    },
+3.  methods: {
+        editorInit: function () {
+            require('brace/ext/language_tools') //language extension prerequsite...
+            require('brace/mode/html')                
+            require('brace/mode/json')    //language  这里改为sjon
+            require('brace/mode/less')
+            require('brace/theme/chrome')
+            require('brace/snippets/javascript') //snippet
+        }
+    },
+
+4. <editor v-model="content" @init="editorInit" lang="json" theme="chrome" width="500" height="100"></editor>
