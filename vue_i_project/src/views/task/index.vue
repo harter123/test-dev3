@@ -6,7 +6,7 @@
             <el-card class="task-card" v-for="item in taskList" :key="item.id">
                 <div slot="header" class="task-card-header">
                     <div>
-                        {{item.name}}
+                        <a href="javascript:void(0)" @click="showDrawer(item.id)"> {{item.name}}</a>
                     </div>
                     <div>
                         <el-button style="padding: 3px 0;" type="text" @click="openEditModal(item)">编辑
@@ -55,14 +55,69 @@
                 <el-button type="primary" @click="editTaskFun">确 定</el-button>
             </div>
         </el-dialog>
+
+
+        <el-drawer
+                :visible.sync="drawerShowFlag"
+                direction="rtl"
+                size="40%">
+            <div slot="title">
+                <el-button type="primary" plain @click="showAddInterface=true">添加接口</el-button>
+            </div>
+            <el-table
+                    :data="interfaces"
+                    stripe
+                    style="width: 100%">
+                <el-table-column
+                        prop="name"
+                        label="名称"
+                        min-width="40%">
+                </el-table-column>
+                <el-table-column
+                        label="URL"
+                        min-width="45%">
+                    <template slot-scope="scope">
+                        {{scope.row.context.url}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" min-width="15%">
+                    <template slot-scope="scope">
+                        <el-button
+                                @click="deleteTaskInterfaceFun(scope.row)"
+                                size="mini"
+                                type="danger">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+
+
+        </el-drawer>
+
+        <el-dialog
+                title="添加接口"
+                :visible.sync="showAddInterface"
+                width="40%">
+            <selectInterface></selectInterface>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showAddInterface = false">取 消</el-button>
+                <el-button type="primary" @click="showAddInterface = false">确 定</el-button>
+              </span>
+        </el-dialog>
+
     </div>
 </template>
 
 <script>
     import {addTask, deleteTask, getAllTasks, updateTask} from "../../request/task";
+    import {deleteTaskInterface, getTaskInterfaces} from "../../request/task_interface";
+    import selectInterface from "./selectInterface"
 
     export default {
         name: "index",
+        components: {
+            selectInterface
+        },
         data() {
             return {
                 dialogAddVisible: false,
@@ -93,12 +148,43 @@
                     ]
                 },
                 taskList: [],
+
+                interfaces: [],
+                drawerShowFlag: false,
+                showAddInterface: true,
             }
         },
         created() {
             this.getAllTasksFun()
         },
         methods: {
+            showDrawer(taskId) {
+                getTaskInterfaces(taskId).then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.interfaces = data.data.data;
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                });
+                this.drawerShowFlag = true;
+            },
+            deleteTaskInterfaceFun(taskInterface) {
+                deleteTaskInterface(taskInterface.task_interface_id).then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.showDrawer(taskInterface.task_id)
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                });
+            },
             deleteTaskFun(taskId) {
                 this.$confirm('此操作将永久删除该任务, 是否继续?', '提示', {
                     confirmButtonText: '确定',

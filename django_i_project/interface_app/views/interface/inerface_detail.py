@@ -49,13 +49,16 @@ class InterfaceDetailView(MyBaseDetailView):
         if not form.is_valid():
             return response_failed()
 
-        service = self.model.objects.filter(id=base_id).first()
-        if not service:
+        interface = self.model.objects.filter(id=base_id).first()
+        if not interface:
             return response_failed(code=self.code, message='数据不存在')
 
         self.model.objects.filter(id=base_id).update(**form.cleaned_data) # 这里返回的id
-        service = self.model.objects.filter(id=base_id).first()
-        return response_success(model_to_dict(service))
+        interface = self.model.objects.filter(id=base_id).first()
+
+        ret = model_to_dict(interface)
+        ret['context'] = json.loads(ret['context'], encoding="utf-8")
+        return response_success(ret)
 
     def delete(self, request, base_id, *args, **kwargs):
         """

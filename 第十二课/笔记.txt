@@ -1,0 +1,11 @@
+内容：
+任务的接口关联，也是包括增删改查
+
+python:
+
+isinstance(对象, 类型)  这个函数用来判断一个对象的数据类型
+
+vue Slot 是一种插槽   https://cn.vuejs.org/v2/guide/components-slots.html
+
+举个例子，你有一个组件，里面有个按钮，这个按钮的名称在不同的地方是不同的，
+那么这时候你就可以把名称定为为一个插槽

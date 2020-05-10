@@ -22,6 +22,8 @@ from interface_app.views.service.service_detail import ServiceDetailView
 from interface_app.views.service.service_list import ServiceListView
 from interface_app.views.task.task_detail import TaskDetailView
 from interface_app.views.task.task_list import TaskListView
+from interface_app.views.task_interface.task_interface_detail import TaskInterfaceDetailView
+from interface_app.views.task_interface.task_interface_list import TaskInterfaceListView
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
@@ -38,4 +40,7 @@ urlpatterns = [
 
     path('api/interfaces/', InterfaceListView.as_view()),
     path('api/interface/<int:base_id>/', InterfaceDetailView.as_view()),
+
+    path('api/task_interfaces/', TaskInterfaceListView.as_view()),
+    path('api/task_interface/<int:base_id>/', TaskInterfaceDetailView.as_view()),
 ]
