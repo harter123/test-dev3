@@ -98,10 +98,10 @@
                 title="添加接口"
                 :visible.sync="showAddInterface"
                 width="40%">
-            <selectInterface></selectInterface>
+            <selectInterface ref="selectInterface"></selectInterface>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="showAddInterface = false">取 消</el-button>
-                <el-button type="primary" @click="showAddInterface = false">确 定</el-button>
+                <el-button type="primary" @click="addTaskInterfacesFun">确 定</el-button>
               </span>
         </el-dialog>
 
@@ -110,7 +110,7 @@
 
 <script>
     import {addTask, deleteTask, getAllTasks, updateTask} from "../../request/task";
-    import {deleteTaskInterface, getTaskInterfaces} from "../../request/task_interface";
+    import {addTaskInterfaces, deleteTaskInterface, getTaskInterfaces} from "../../request/task_interface";
     import selectInterface from "./selectInterface"
 
     export default {
@@ -151,14 +151,38 @@
 
                 interfaces: [],
                 drawerShowFlag: false,
-                showAddInterface: true,
+                showAddInterface: false,
+                currentTaskId: 0,
             }
         },
         created() {
             this.getAllTasksFun()
         },
         methods: {
+            addTaskInterfacesFun() {
+                let multipleSelection = this.$refs.selectInterface.multipleSelection;
+                let req = [];
+                for (let i = 0; i < multipleSelection.length; i++) {
+                    req.push({task_id:this.currentTaskId, interface_id: multipleSelection[i].id})
+                }
+                if(0 === req.length){
+                    return
+                }
+                addTaskInterfaces(req).then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.showAddInterface = false;
+                        this.showDrawer(this.currentTaskId);
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                });
+            },
             showDrawer(taskId) {
+                this.currentTaskId = taskId;
                 getTaskInterfaces(taskId).then(data => {
                     let success = data.data.success;
                     if (success) {

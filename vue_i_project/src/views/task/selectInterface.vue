@@ -1,19 +1,20 @@
 <template>
     <div class="main-list">
-        <div class="service-list">
-            <div v-for="item in serviceList" :key="item.id" class="service-item">
-                <a style='text-decoration:none;' href="javascript:void(0)" @click="getInterfacesFun(item.id)">
-                    {{item.name}}
-                </a>
-            </div>
-        </div>
 
         <div class="interface-list">
+            <el-select v-model="serviceId" placeholder="请选择" @change="changeSelectService">
+                <el-option
+                  v-for="item in serviceList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
             <el-table
                     @selection-change="handleSelectionChange"
                     :data="interfaceList"
                     stripe
-                    style="width: 100%">
+                    style="width: 100%; max-height: 600px; overflow: auto">
                 <el-table-column
                   type="selection"
                   width="%5">
@@ -43,6 +44,7 @@
         name: "selectInterface",
         data() {
             return {
+                serviceId: undefined,
                 serviceList: [],
                 interfaceList: [],
 
@@ -50,6 +52,9 @@
             }
         },
         methods: {
+            changeSelectService(serviceId){
+                this.getInterfacesFun(serviceId)
+            },
             getInterfacesFun(serviceId) {
                 getInterfaces(serviceId).then(data => {
                     let success = data.data.success;
@@ -97,8 +102,9 @@
     }
 
     .interface-list {
-        width: 80%;
+        width: 100%;
         padding: 5px;
+
     }
 
     .service-item {

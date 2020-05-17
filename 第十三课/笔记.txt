@@ -1,0 +1,81 @@
+大纲：
+1. 把任务的添加接口给完善
+2. 学习一下虫师，普及一下简单的pytest
+
+<el-select v-model="serviceId" placeholder="请选择">
+                <el-option
+                        v-for="item in serviceList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                </el-option>
+            </el-select>
+
+v-model="serviceId"  代表在选择了不同的值的时候，列表返回的值，这里就是服务id，因为这里就是一个服务列表，
+所以选择不同的服务，就应该返回不同的id，这是一个双向绑定
+
+<el-option
+                        v-for="item in serviceList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                </el-option>
+这个代表不同的选项，这里就是用一个v-for 把所有的服务列表都展示出来了
+key不同管，只要是唯一就可以了
+label 代表着选择项展示的文本
+value 代表在选择了某个选项后，返回到 v-model="serviceId"  的真正的值
+
+
+
+在table里面添加了这个，就会有chebox框
+    <el-table-column
+      type="selection"
+      width="55">
+    </el-table-column>
+@selection-change="handleSelectionChange"> # 列表的checkbox发生变化，就会触发这个事件
+
+	
+ref 是vue里面的id
+
+
+this.$refs.selectInterface   这个实际上就是获取 ref=selectInterface  的组件
+形式是固定的  this.$refs.加上ref   跟 document.getElementById  是类似的
+
+let multipleSelection = this.$refs.selectInterface.multipleSelection; 
+这句代码就能够拿到 选择接口列表的组件 里面的multipleSelection 的值，也就是已选择的接口列表
+
+普及一个新的知识点
+let object=this.$refs.selectInterface 这是根据ref来获取一个组件的对象
+那么根据object 这个对象，我们可以获取得到这个组件下面的所有的属性和函数，包括data，methods，而且直接就能够拿到了
+比如说  object.xxx   这个xxx 可以是定义在data里面的变量，也可以定义在methods的函数
+
+
+
+
+pytest：
+https://www.cnblogs.com/fnng/p/4765112.html
+https://www.cnblogs.com/fnng/p/4768239.html
+
+Pytest 是 Python 的一种单元测试框架，与 Python 自带的 unittest 测试框架类似，但是比 unittest 框架使用起来更简洁，效率更高。
+
+Pytest 是一个成熟的全功能的 Python 测试工具，可以帮助你写出更好的程序，让我们很方便的编写测试用例。
+
+适合从简单的单元到复杂的功能测试。有很多的第三方插件可以自定义扩展，并且支持 Allure，生成可视化的测试报告和测试结果，并能输出 log 信息。
+
+pip install -U pytest
+pip install pytest-html 生成htlm报告
+
+
+pytest
+1.识别test开头的函数，然后执行
+2.识别test开头的类，然后执行test开头的成员函数
+
+
+执行方式：
+1. pytest  +  文件或者是目录
+2. 在代码里面码上： pytest.main(["文件或者是目录"]), 然后按照正常的python脚本执行即可：  python  +  文件
+
+
+生成报告：
+pytest test_class.py  --resultlog=./log.txt  文本报告
+pytest test_class.py --html=./report.html   html报告
