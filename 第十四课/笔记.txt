@@ -1,0 +1,87 @@
+大纲： 
+1. 介绍一下数据驱动
+2. 编写任务的执行代码
+
+
+什么是数据驱动测试？
+从它的定义来看，就是数据的改变从而驱动自动化测试的执行，最终引起测试结果的改变。说的直白些，就是参数化的应用。
+更加简单的来说，举个例子，就是一个登录接口，肯定会有很多不同的数据测试的情况，那么把所有的数据都集合在一个文件里面去，
+一并执行，有多少条数据，就执行多少次用例。
+
+
+pytest 如何进行数据驱动测试：
+@pytest.mark.parametrize(("name", "password"), [
+    ["user1","psd1"],
+    ["user2","psd2"],
+])
+def test_login(name, password):
+    assert a + b == expected
+	
+讲解：
+@pytest.mark.parametrize  这是一个装饰器，固定的结构，写在你需要测试的用例上面
+
+("name", "password") 这个是参数列表， 类比如果是一个登录接口，那么这几个就是 用户名，密码
+
+[
+    ["user1","psd1"],  这个就是真实的数据， 这里有两条，就代表执行两次， 这是一个二维数据
+    ["user2","psd2"],
+]
+
+def test_login(name, password)  这里的参数名称必须要跟 上面@pytest.mark.parametrize的参数名称和数量都是一致的
+
+
+开始构造我们的任务执行部分的，如何结合我们的django来执行pytest
+我想到的方法就是，我们添加一个接口，这个接口就是执行一个任务，然后这个的任务的执行就是执行一个pytest命令
+说白，我们执行一个任务，就是启动一个 pytest测试： pytest -v xxx.py
+
+这里就设计到一个问题，我们的pytest 跟 django是数据两个不同的进程，执行  pytest -v xxx.py 是一个新的进程。
+
+类比  qq  和 谷歌浏览器， 我们qq就类比 django, 谷歌浏览器就类比  pytest。  
+我们可以直接在qq里面打开一个链接，打开谷歌浏览器。
+
+谷歌浏览器是不可能直接获取得了 qq的数据的
+所有pytest也是不可能直接可以获取的了django里面的 任务，接口，服务这些数据。
+所以我们就需要解决一个问题，如何直接获取django里面的数据
+
+加上下面的代码就可以了：
+import os
+import sys
+import django
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # 定位到你的django根目录
+sys.path.append(os.path.abspath(os.path.join(BASE_DIR, os.pardir)))  # 把django目录放到环境变量里面
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_i_project.settings")  # django项目的配置，你的django的settings文件
+django.setup()  # django的初始化
+
+from interface_app.models.task import TaskInterface  这些关于django的导入，必须要放到配置代码的下面，紧跟着 django.setup() 这句
+
+构造我们的执行流程：
+1. 提供一个任务的id   
+2. 获取任务所有的接口
+3. 构造数据驱动的数据
+4. 进行所有的接口的http请求
+5. 把所有的接口的请求进行断言
+6. 生成测试报告
+
+
+对于第一步，如何动态设置一个任务id。
+# 在数据库添加一个表，里面的数据就是需要执行的任务id。
+对于执行一个任务来说，就是把任务的id加到 数据库，然后执行pytest命令，然后pytest从数据库里面获取这个任务id
+
+
+django添加一个接口，执行任务的接口
+
+对于执行任务来说，首先会有很多个不同的任务，每个任务也是有很多个不同的执行结构，所以我们需要把不同的任务的结果给管理起来
+
+1.如何区分不同的任务结果：
+	我们可以建立一个文件夹，文件夹下面，以不同的任务的id为文件名称，来区分不同的任务的执行结果
+2.如何区分相同的任务的不同的执行结果： 
+	每个report的名称直接用执行时间来区分  xxxx-xx-xx-xx-xx-xx.html
+
+
+from django.conf import settings
+
+settings.BASE_DIR  # 这个就是django的根目录
+
+
+

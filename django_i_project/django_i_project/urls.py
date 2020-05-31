@@ -1,17 +1,17 @@
 """django_i_project URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.1/topics/http/urls/
+    https://docs.djangoproject.com/en/reports.1/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+    reports. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
     1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+    reports. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+    reports. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
 from django.urls import path
@@ -20,6 +20,7 @@ from interface_app.views.interface.inerface_detail import InterfaceDetailView
 from interface_app.views.interface.interface_list import InterfaceListView
 from interface_app.views.service.service_detail import ServiceDetailView
 from interface_app.views.service.service_list import ServiceListView
+from interface_app.views.task.run_task import get_task_report_list, get_task_report_detail, run_task
 from interface_app.views.task.task_detail import TaskDetailView
 from interface_app.views.task.task_list import TaskListView
 from interface_app.views.task_interface.task_interface_detail import TaskInterfaceDetailView
@@ -43,4 +44,8 @@ urlpatterns = [
 
     path('api/task_interfaces/', TaskInterfaceListView.as_view()),
     path('api/task_interface/<int:base_id>/', TaskInterfaceDetailView.as_view()),
+
+    path('api/task/<int:task_id>/run/', run_task),
+    path('api/task/<int:task_id>/reports/', get_task_report_list),
+    path('api/task/<int:task_id>/report/<str:report_name>/', get_task_report_detail),
 ]

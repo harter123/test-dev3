@@ -15,10 +15,10 @@ class Interface(models.Model):
     #     "url": "",
     #     "params": {
     #         "a": 1,
-    #         "b": 2,
+    #         "b": reports,
     # },
     #     "assert": {
-    #          "a": "include",
-     #         "b": "exclude",
+    #          "a": "include",  代表包含 a
+     #         "b": "exclude",  代表不包含 b
     #      }
     # }

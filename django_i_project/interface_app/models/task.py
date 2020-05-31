@@ -10,3 +10,6 @@ class Task(models.Model):
 class TaskInterface(models.Model):
     task_id = models.IntegerField('任务id', default=0, db_index=True)
     interface_id = models.IntegerField('接口id', default=0)
+
+class RunTask(models.Model):
+    task_id = models.IntegerField('任务id', default=0)
