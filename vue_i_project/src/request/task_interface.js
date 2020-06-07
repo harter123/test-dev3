@@ -11,3 +11,11 @@ export const addTaskInterfaces = function (data_list) { //创建任务和接口�
 export const deleteTaskInterface = function (taskInterfaceId) {//删除任务下的接口
     return deleteRequest(`task_interface/${taskInterfaceId}/`);
 };
+
+export const getTaskReports = function (taskId) { //获取任务下的report
+    return getRequest(`task/${taskId}/reports/`)
+};
+
+export const runTask = function (taskId) { //执行任务
+    return getRequest(`task/${taskId}/run/`)
+};

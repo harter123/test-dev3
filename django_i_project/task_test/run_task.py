@@ -10,11 +10,15 @@ sys.path.append(os.path.abspath(os.path.join(BASE_DIR, os.pardir)))  # 把django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_i_project.settings")  # django项目的配置，你的django的settings文件
 django.setup()  # django的初始化
 
-from interface_app.models.task import TaskInterface
+from interface_app.models.task import TaskInterface, RunTask
 from interface_app.models.interface import Interface
 from task_test.http_request import HttpRequest
 
-task_id = 1  # 1. 提供一个任务id
+run_task = RunTask.objects.all().first()  # 1. 提供一个任务id
+if run_task is None:
+    exit(-1)
+task_id = run_task.task_id
+
 params_list = []  # 这是参数列表
 
  # reports. 获取任务所有的接口

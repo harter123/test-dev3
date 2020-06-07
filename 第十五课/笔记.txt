@@ -1,0 +1,57 @@
+大纲：
+完成任务执行的前端展示以及调试
+
+
+如何在 django里面使用 html静态文件
+1.在项目目录下的setting.py中找到模板设置TEMPLATES，并进行配置"DIRS"
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, "task_test", "reports")], 
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+2.然后在代码里面以  os.path.join(BASE_DIR, "task_test", "reports") 这个目录为相对路径进行 定为
+name = str(task_id) + "/" + report_name
+return render(request, name)
+
+
+关于那个report文件的css文件的路径问题：
+report文件里面的css是  href="assets/style.css"， 这个实际上是一个相对路径，如果你设置访问的路径不正确，那就基本上是访问不了的，
+所以呢，我们需要改变一下这个，把路径改为绝对路径，只要在前面添加一个 /api_static  即可：  href="/api_static/assets/style.css"
+
+file = open(task_report_path, "rt", encoding='utf-8')
+html_context = file.read()
+html_context = str(html_context)
+html_context = html_context.replace('href="assets/style.css"', 'href="/api_static/assets/style.css"')
+
+new_file = open(task_report_path, "w", encoding='utf-8')
+new_file.write(html_context)
+
+return render(request, str(task_id) + "/" + report_name)
+
+
+当然，我们还要配置静态目录，把task_test这个目录作为静态目录，所以/api_static/assets/style.css  就等于是访问静态目录下面的assets/style.css
+STATICFILES_DIRS=(
+    os.path.join(BASE_DIR,"task_test"),
+)
+STATIC_URL='/api_static/'  # 这个是前缀，静态文件必须要有一个前缀
+
+
+我们还要修改一下nginx, 把api_static 前缀的url转发到8000，而不是8080
+# 配置django, 
+		location /api_static/ {
+            proxy_pass http://127.0.0.1:8000;
+            proxy_pass_request_headers      on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }

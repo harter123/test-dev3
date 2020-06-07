@@ -19,6 +19,10 @@
                 </div>
                 <div>
                     {{item.description}}
+
+                    <div>
+                        <a href="javascript:void(0)" @click="showReportDrawer(item.id)">查看报告</a>
+                    </div>
                 </div>
             </el-card>
 
@@ -62,7 +66,7 @@
                 direction="rtl"
                 size="40%">
             <div slot="title">
-                <el-button type="primary" plain @click="showAddInterface=true">添加接口</el-button>
+                <el-button type="primary" v-loading.fullscreen.lock="fullscreenLoading" plain @click="showAddInterface=true">添加接口</el-button>
             </div>
             <el-table
                     :data="interfaces"
@@ -91,7 +95,26 @@
                 </el-table-column>
             </el-table>
 
+        </el-drawer>
 
+        <el-drawer
+                :visible.sync="drawerReportShowFlag"
+                direction="rtl"
+                size="40%">
+            <div slot="title">
+                <el-button type="primary" plain @click="runTaskFun">执行任务</el-button>
+            </div>
+            <el-table
+                    :data="reports"
+                    stripe
+                    style="width: 100%">
+                <el-table-column label="名称">
+                    <template slot-scope="scope">
+                        <a href="javascript:void(0)" @click="openReportDetail(scope.row)">{{scope.row}}</a>
+                    </template>
+                </el-table-column>
+
+            </el-table>
         </el-drawer>
 
         <el-dialog
@@ -110,7 +133,12 @@
 
 <script>
     import {addTask, deleteTask, getAllTasks, updateTask} from "../../request/task";
-    import {addTaskInterfaces, deleteTaskInterface, getTaskInterfaces} from "../../request/task_interface";
+    import {
+        addTaskInterfaces,
+        deleteTaskInterface,
+        getTaskInterfaces,
+        getTaskReports, runTask
+    } from "../../request/task_interface";
     import selectInterface from "./selectInterface"
 
     export default {
@@ -153,6 +181,10 @@
                 drawerShowFlag: false,
                 showAddInterface: false,
                 currentTaskId: 0,
+
+                reports: [],
+                drawerReportShowFlag: false,
+                fullscreenLoading: false,
             }
         },
         created() {
@@ -195,6 +227,21 @@
                     }
                 });
                 this.drawerShowFlag = true;
+            },
+            showReportDrawer(taskId) {
+                this.currentTaskId = taskId;
+                getTaskReports(taskId).then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.reports = data.data.data;
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                });
+                this.drawerReportShowFlag = true;
             },
             deleteTaskInterfaceFun(taskInterface) {
                 deleteTaskInterface(taskInterface.task_interface_id).then(data => {
@@ -294,7 +341,26 @@
                         return false;
                     }
                 });
-            }
+            },
+            openReportDetail(reportName){
+                window.open(`/api/task/${this.currentTaskId}/report/${reportName}/`)
+            },
+            runTaskFun(){
+                this.fullscreenLoading = true
+                runTask(this.currentTaskId).then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.showReportDrawer(this.currentTaskId)
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                    this.fullscreenLoading = false
+                })
+            },
+
         }
     }
 </script>
