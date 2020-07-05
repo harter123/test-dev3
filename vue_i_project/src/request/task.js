@@ -1,7 +1,7 @@
 import {deleteRequest, getRequest, postRequest, putRequest} from "./common";
 
-export const getAllTasks = function () { //获取所有的任务
-    return getRequest('tasks/')
+export const getAllTasks = function (page=1, size=20) { //获取所有的任务
+    return getRequest('tasks/', {page: page, size: size})
 };
 
 export const getSingleTask = function (taskId) { //获取单个的任务

@@ -2,6 +2,7 @@ import json
 
 from django.forms import model_to_dict
 from django.views.generic import View
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from interface_app.forms.service_form import ServiceForm
 from interface_app.libs.reponse import response_success, response_failed, ErrorCode
@@ -22,12 +23,27 @@ class MyBaseListView(View):
         :param kwargs:
         :return:
         """
+        page = request.GET.get('page', 1)
+        size = request.GET.get('size', 1000)
         services = self.model.objects.all()
+        total = len(services)
+
+        paginator = Paginator(services, size)  # Show 25 contacts per page
+        try:
+            page_res = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            page_res = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            page_res = paginator.page(1)
+
+        res = page_res.object_list
         ret = []
-        for s in services:
+        for s in res:
             t = model_to_dict(s)
             ret.append(t)
-        return response_success(ret)
+        return response_success({"page": page, "size": size, "total": total, "list":ret })
 
     def post(self, request, *args, **kwargs):
         """

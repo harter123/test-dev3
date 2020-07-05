@@ -3,29 +3,89 @@
         <el-button @click="openAddModal">创建任务</el-button>
 
         <div class="task-list">
-            <el-card class="task-card" v-for="item in taskList" :key="item.id">
-                <div slot="header" class="task-card-header">
-                    <div>
-                        <a href="javascript:void(0)" @click="showDrawer(item.id)"> {{item.name}}</a>
-                    </div>
-                    <div>
-                        <el-button style="padding: 3px 0;" type="text" @click="openEditModal(item)">编辑
+            <!--<el-card class="task-card" v-for="item in taskList" :key="item.id">-->
+                <!--<div slot="header" class="task-card-header">-->
+                    <!--<div>-->
+                        <!--<a href="javascript:void(0)" @click="showDrawer(item.id)"> {{item.name}}</a>-->
+                    <!--</div>-->
+                    <!--<div>-->
+                        <!--<el-button style="padding: 3px 0;" type="text" @click="openEditModal(item)">编辑-->
+                        <!--</el-button>-->
+                        <!--<el-button style="padding: 3px 0;margin-left: 5px;" type="text"-->
+                                   <!--@click="deleteTaskFun(item.id)">删除-->
+                        <!--</el-button>-->
+                    <!--</div>-->
+
+                <!--</div>-->
+                <!--<div>-->
+                    <!--{{item.description}}-->
+
+                    <!--<div>-->
+                        <!--<a href="javascript:void(0)" @click="showReportDrawer(item.id)">查看报告</a>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</el-card>-->
+
+            <el-table
+                    :data="taskList"
+                    style="width: 100%">
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        width="50">
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        label="名称"
+                        width="250">
+                    <template slot-scope="scope">
+                        <a @click="showDrawer(scope.row.id)" href="javascript:void(0)">
+                            {{scope.row.name}}
+                        </a>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="description"
+                        label="描述"
+                        width="500">
+                </el-table-column>
+                <el-table-column
+                        prop="address"
+                        label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                @click.native.prevent="openEditModal(scope.row)"
+                                type="text"
+                                size="small">
+                            编辑
                         </el-button>
-                        <el-button style="padding: 3px 0;margin-left: 5px;" type="text"
-                                   @click="deleteTaskFun(item.id)">删除
+                        <el-button
+                                @click.native.prevent="deleteTaskFun(scope.row.id)"
+                                type="text"
+                                size="small">
+                            删除
                         </el-button>
-                    </div>
+                        <el-button
+                                @click.native.prevent="showReportDrawer(scope.row.id)"
+                                type="text"
+                                size="small">
+                            查看报告
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
 
-                </div>
-                <div>
-                    {{item.description}}
-
-                    <div>
-                        <a href="javascript:void(0)" @click="showReportDrawer(item.id)">查看报告</a>
-                    </div>
-                </div>
-            </el-card>
-
+        <div style="text-align:right; margin-top: 10px">
+            <el-pagination
+                    @size-change="changeSize"
+                    @current-change="changePage"
+                    :current-page.sync="page"
+                    :page-sizes="[10, 20, 50, 100]"
+                    :page-size="size"
+                    layout="sizes, prev, pager, next"
+                    :total="total">
+            </el-pagination>
         </div>
 
         <el-dialog title="创建任务" :visible.sync="dialogAddVisible">
@@ -176,6 +236,9 @@
                     ]
                 },
                 taskList: [],
+                page:1,
+                size:20,
+                total:0,
 
                 interfaces: [],
                 drawerShowFlag: false,
@@ -191,6 +254,14 @@
             this.getAllTasksFun()
         },
         methods: {
+            changeSize(value){
+                this.size = value;
+                this.getAllTasksFun()
+            },
+            changePage(value){
+                this.page = value;
+                 this.getAllTasksFun()
+            },
             addTaskInterfacesFun() {
                 let multipleSelection = this.$refs.selectInterface.multipleSelection;
                 let req = [];
@@ -279,10 +350,11 @@
                 });
             },
             getAllTasksFun() {
-                getAllTasks().then(data => {
+                getAllTasks(this.page, this.size).then(data => {
                     let success = data.data.success;
                     if (success) {
-                        this.taskList = data.data.data;
+                        this.taskList = data.data.data.list;
+                        this.total=data.data.data.total;
                     } else {
                         this.$notify.error({
                             title: '错误',

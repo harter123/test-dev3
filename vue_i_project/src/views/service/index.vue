@@ -3,26 +3,82 @@
         <el-button @click="openAddModal">创建服务</el-button>
 
         <div class="service-list">
-            <el-card class="service-card" v-for="item in serviceList" :key="item.id">
-                <div slot="header" class="service-card-header">
+            <!--<el-card class="service-card" v-for="item in serviceList" :key="item.id">-->
+            <!--<div slot="header" class="service-card-header">-->
 
-                    <div @click="goToInterface(item.id)">
-                        <a href="javascript:void(0)">{{item.name}}</a>
-                    </div>
-                    <div>
-                        <el-button style="padding: 3px 0;" type="text" @click="openEditModal(item)">编辑
+            <!--<div @click="goToInterface(item.id)">-->
+            <!--<a href="javascript:void(0)">{{item.name}}</a>-->
+            <!--</div>-->
+            <!--<div>-->
+            <!--<el-button style="padding: 3px 0;" type="text" @click="openEditModal(item)">编辑-->
+            <!--</el-button>-->
+            <!--<el-button style="padding: 3px 0;margin-left: 5px;" type="text"-->
+            <!--@click="deleteServiceFun(item.id)">删除-->
+            <!--</el-button>-->
+            <!--</div>-->
+
+            <!--</div>-->
+            <!--<div>-->
+            <!--{{item.description}}-->
+            <!--</div>-->
+            <!--</el-card>-->
+
+            <el-table
+                    :data="serviceList"
+                    style="width: 100%">
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        width="50">
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        label="名称"
+                        width="250">
+                    <template slot-scope="scope">
+                        <a @click="goToInterface(scope.row.id)" href="javascript:void(0)">
+                            {{scope.row.name}}
+                        </a>
+                    </template>
+
+                </el-table-column>
+                <el-table-column
+                        prop="description"
+                        label="描述"
+                        width="500">
+                </el-table-column>
+                <el-table-column
+                        prop="address"
+                        label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                @click.native.prevent="openEditModal(scope.row)"
+                                type="text"
+                                size="small">
+                            编辑
                         </el-button>
-                        <el-button style="padding: 3px 0;margin-left: 5px;" type="text"
-                                   @click="deleteServiceFun(item.id)">删除
+                        <el-button
+                                @click.native.prevent="deleteServiceFun(scope.row.id)"
+                                type="text"
+                                size="small">
+                            删除
                         </el-button>
-                    </div>
+                    </template>
+                </el-table-column>
+            </el-table>
 
-                </div>
-                <div>
-                    {{item.description}}
-                </div>
-            </el-card>
 
+        </div>
+        <div style="text-align:right; margin-top: 10px">
+            <el-pagination
+                    @size-change="changeSize"
+                    @current-change="changePage"
+                    :current-page.sync="page"
+                    :page-sizes="[10, 20, 50, 100]"
+                    :page-size="size"
+                    layout="sizes, prev, pager, next"
+                    :total="total">
+            </el-pagination>
         </div>
 
         <el-dialog title="创建服务" :visible.sync="dialogAddVisible">
@@ -94,13 +150,24 @@
                     ]
                 },
                 serviceList: [],
+                total: 0,
+                page: 1,
+                size: 20,
             }
         },
         created() {
             this.getAllServicesFun()
         },
         methods: {
-            goToInterface(serviceId){
+            changeSize(value){
+                this.size = value;
+                this.getAllServicesFun()
+            },
+            changePage(value){
+                this.page = value;
+                 this.getAllServicesFun()
+            },
+            goToInterface(serviceId) {
                 this.$router.push(`/interface/?serviceId=${serviceId}`)
             },
             deleteServiceFun(serviceId) {
@@ -126,10 +193,11 @@
                 });
             },
             getAllServicesFun() {
-                getAllServices().then(data => {
+                getAllServices(this.page, this.size).then(data => {
                     let success = data.data.success;
                     if (success) {
-                        this.serviceList = data.data.data;
+                        this.serviceList = data.data.data.list;
+                        this.total = data.data.data.total;
                     } else {
                         this.$notify.error({
                             title: '错误',

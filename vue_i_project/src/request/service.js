@@ -1,7 +1,7 @@
 import {deleteRequest, getRequest, postRequest, putRequest} from "./common";
 
-export const getAllServices = function () { //获取所有的服务
-    return getRequest('services/')
+export const getAllServices = function (page=1, size=20) { //获取所有的服务
+    return getRequest('services/', {page:page, size:size})
 };
 
 export const getSingleService = function (serviceId) { //获取单个的服务

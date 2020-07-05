@@ -1,6 +1,14 @@
 <template>
     <div class="interface-main">
-        <el-button @click="openAddModal">创建接口</el-button>
+        <el-select v-model="serviceId" placeholder="请选择" @change="changeService">
+            <el-option
+                    v-for="item in serviceList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+            </el-option>
+        </el-select>
+        <el-button @click="openAddModal" style="margin-left: 10px">创建接口</el-button>
         <el-table
                 :data="interfaces"
                 stripe
@@ -48,7 +56,8 @@
                     <el-input v-model="addForm.description"></el-input>
                 </el-form-item>
                 <el-form-item label="内容" prop="context">
-                    <editor v-model="addForm.context" @init="editorInit" lang="json" theme="chrome" width="450" height="200"></editor>
+                    <editor v-model="addForm.context" @init="editorInit" lang="json" theme="chrome" width="450"
+                            height="200"></editor>
                 </el-form-item>
 
             </el-form>
@@ -70,7 +79,8 @@
                     <el-input v-model="editForm.description"></el-input>
                 </el-form-item>
                 <el-form-item label="内容" prop="context">
-                    <editor v-model="editForm.context" @init="editorInit" lang="json" theme="chrome" width="450" height="200"></editor>
+                    <editor v-model="editForm.context" @init="editorInit" lang="json" theme="chrome" width="450"
+                            height="200"></editor>
                 </el-form-item>
 
             </el-form>
@@ -84,6 +94,7 @@
 
 <script>
     import {deleteInterface, getInterfaces, addInterface, updateInterface} from "../../request/interface";
+    import {getAllServices} from "../../request/service";
 
     export default {
         name: "index",
@@ -94,7 +105,7 @@
             return {
                 addDialogVisible: false,
                 editDialogVisible: false,
-                serviceId: 0,
+                serviceId: undefined,
                 interfaces: [],
 
 
@@ -123,13 +134,27 @@
                     context: [
                         {required: true, message: '请输入内容', trigger: 'blur'},
                     ],
-                }
+                },
+                serviceList: [],
             }
         },
         methods: {
+            getAllServicesFun() {
+                getAllServices().then(data => {
+                    let success = data.data.success;
+                    if (success) {
+                        this.serviceList = data.data.data.list;
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请求失败'
+                        });
+                    }
+                })
+            },
             editorInit: function () {
                 require('brace/ext/language_tools') //language extension prerequsite...
-                require('brace/mode/json')                
+                require('brace/mode/json')
                 require('brace/mode/javascript')    //language  这里改为sjon
                 require('brace/mode/less')
                 require('brace/theme/chrome')
@@ -182,15 +207,15 @@
                         return false;
                     }
                 });
-                
+
             },
             openAddModal() {
 
                 let context = {
                     "method": "get",
-                     "url": "",
-                     "params":{},
-                     "assert":{}
+                    "url": "",
+                    "params": {},
+                    "assert": {}
                 }
                 this.addForm.context = JSON.stringify(context, null, 4)
                 this.addDialogVisible = true;
@@ -228,12 +253,19 @@
                 //获取url里面的参数
                 let serviceId = this.$route.query.serviceId;
                 if (!serviceId) { //如果是空的
-                    this.serviceId = 0;
+                    this.serviceId = undefined;
                     return;
                 }
                 this.serviceId = Number(serviceId)
             },
+            changeService(){
+                this.getInterfacesFun()
+                this.$router.push(`/interface/?serviceId=${this.serviceId}`)
+            },
             getInterfacesFun() {
+                if(!this.serviceId){
+                    return
+                }
                 getInterfaces(this.serviceId).then(data => {
                     let success = data.data.success;
                     if (success) {
@@ -250,6 +282,7 @@
         created() {
             this.getServiceId();
             this.getInterfacesFun();
+            this.getAllServicesFun();
         },
         watch: {
             "$route.query": function () {
